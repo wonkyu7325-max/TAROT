@@ -1,0 +1,5 @@
+{
+  "name": "TAROT 解惑师",
+  "description": "一个基于 Google Gemini 的现代化塔罗牌解读应用，通过直观的卡牌抽取与 AI 深度解析，为用户解答心中困惑。",
+  "requestFramePermissions": []
+}
