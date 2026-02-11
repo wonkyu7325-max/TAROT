@@ -27,7 +27,7 @@ export const recommendSpreads = async (question: string): Promise<Spread[]> => {
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: prompt,
+      contents: [{ parts: [{ text: prompt }] }],
       config: {
         temperature: 0.1, 
       }
@@ -94,18 +94,36 @@ export const getTarotReading = async (request: ReadingRequest): Promise<string> 
     4. 如果是负面牌（如死神、高塔），请侧重于转化和重生的积极意义。
   `;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
-      contents: prompt,
-      config: {
-        temperature: 0.8, // Slightly creative
-      }
-    });
+  const generateWithRetry = async () => {
+    try {
+      // First try with Gemini 3 Pro for higher quality
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-pro-preview',
+        contents: [{ parts: [{ text: prompt }] }],
+        config: {
+          temperature: 0.8,
+        }
+      });
+      return response.text;
+    } catch (error) {
+      console.warn("Gemini 3 Pro failed, falling back to Flash...", error);
+      // Fallback to Gemini 3 Flash if Pro fails (e.g. overload or error 500)
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: [{ parts: [{ text: prompt }] }],
+        config: {
+          temperature: 0.8,
+        }
+      });
+      return response.text;
+    }
+  };
 
-    return response.text || "抱歉，TAROT 现在的连接有点不稳定，请稍后再试。";
+  try {
+    const text = await generateWithRetry();
+    return text || "抱歉，TAROT 现在的连接有点不稳定，请稍后再试。";
   } catch (error) {
     console.error("Gemini API Error:", error);
-    return "解读过程中发生了一些神秘的干扰 (API Error)，请检查网络或稍后重试。";
+    return "解读过程中发生了一些神秘的干扰 (API Error)，请检查网络连接或稍后重试。";
   }
 };

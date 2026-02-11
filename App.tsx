@@ -382,10 +382,10 @@ const ShuffleScreen = ({ onComplete }: { onComplete: () => void }) => {
       </div>
 
       <h2 className="text-3xl font-serif text-amber-100 mb-4 animate-pulse">
-        请拿起你的纸质卡牌进行洗牌
+        正在连接宇宙能量...
       </h2>
       <p className="text-purple-200/70 mb-8 max-w-md mx-auto text-lg leading-relaxed">
-        请通过洗牌让纸质卡牌与你产生连接。<br/>
+        请拿起你的纸质卡牌进行洗牌，让意念注入其中。<br/>
         当准备好后，点击下方按钮完成。
       </p>
 
@@ -698,8 +698,11 @@ const CardInputBoard = ({
     { id: Suit.Pentacles, label: '星币', icon: <PentacleIcon size={14} /> },
   ];
 
-  // Filter cards based on search AND tab
+  // Filter cards based on search AND tab AND not already drawn
   const filteredCards = useMemo(() => {
+    // Create a Set of currently drawn cards to exclude them efficiently
+    const drawnIds = new Set(drawnCards.map(d => d.card.id));
+
     return fullDeck.filter(c => {
       const matchesSearch = searchTerm === '' || 
         c.name.includes(searchTerm) || 
@@ -707,9 +710,10 @@ const CardInputBoard = ({
       
       const matchesTab = searchTerm !== '' ? true : c.suit === activeTab; // Ignore tab if searching
       
-      return matchesSearch && matchesTab;
+      // Filter out if card is already selected
+      return matchesSearch && matchesTab && !drawnIds.has(c.id);
     });
-  }, [fullDeck, searchTerm, activeTab]);
+  }, [fullDeck, searchTerm, activeTab, drawnCards]);
 
   const handleSelectCard = (card: TarotCard) => {
     setSelectedCard(card);
