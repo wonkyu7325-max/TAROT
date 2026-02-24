@@ -43,53 +43,51 @@ export const CardComponent: React.FC<CardComponentProps> = ({
           className={`relative preserve-3d transition-all duration-700 ease-in-out ${currentSize} ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}
         >
           {/* Card Back - Mystical Mandala Design */}
-          <div className="absolute inset-0 backface-hidden rounded-lg border border-purple-900/50 bg-[#1a0b2e] overflow-hidden shadow-2xl shadow-purple-900/40 group-hover:shadow-purple-500/20 transition-shadow duration-500">
-             {/* Deep Gradient Background */}
-             <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-[#2d1b4e] to-indigo-950"></div>
+          <div className="absolute inset-0 backface-hidden rounded-xl border-2 border-indigo-900/80 bg-[#0f0518] overflow-hidden shadow-2xl shadow-purple-900/40 group-hover:shadow-amber-500/20 transition-shadow duration-500">
+             {/* Deep Cosmic Background */}
+             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#2e1065_0%,_#0f0518_120%)]"></div>
              
-             {/* Stardust Texture Layer */}
-             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30 mix-blend-overlay"></div>
-
-             {/* Inner Decorative Frames */}
-             <div className="absolute inset-1.5 border border-amber-500/20 rounded-sm opacity-50"></div>
-             <div className="absolute inset-3 border border-purple-500/10 rounded-sm"></div>
+             {/* Starry Pattern */}
+             <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
+             <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)', backgroundSize: '32px 32px', backgroundPosition: '8px 8px' }}></div>
              
-             {/* Corner Flourishes */}
-             <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-amber-500/40 rounded-tl"></div>
-             <div className="absolute top-2 right-2 w-4 h-4 border-t border-r border-amber-500/40 rounded-tr"></div>
-             <div className="absolute bottom-2 left-2 w-4 h-4 border-b border-l border-amber-500/40 rounded-bl"></div>
-             <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-amber-500/40 rounded-br"></div>
+             {/* Intricate Border Layers */}
+             <div className="absolute inset-1 border border-amber-500/20 rounded-lg"></div>
+             <div className="absolute inset-2 border border-purple-500/20 rounded-md"></div>
+             <div className="absolute inset-3 border-[0.5px] border-amber-200/10 rounded-sm"></div>
+             
+             {/* Corner Ornaments */}
+             <div className="absolute top-2 left-2 w-6 h-6 border-t-2 border-l-2 border-amber-600/40 rounded-tl-md"></div>
+             <div className="absolute top-2 right-2 w-6 h-6 border-t-2 border-r-2 border-amber-600/40 rounded-tr-md"></div>
+             <div className="absolute bottom-2 left-2 w-6 h-6 border-b-2 border-l-2 border-amber-600/40 rounded-bl-md"></div>
+             <div className="absolute bottom-2 right-2 w-6 h-6 border-b-2 border-r-2 border-amber-600/40 rounded-br-md"></div>
 
-             {/* Central Mystic Mandala Pattern */}
-             <div className="absolute inset-0 flex items-center justify-center opacity-60">
-                <svg viewBox="0 0 100 100" className="w-[80%] h-[80%] animate-pulse-slow" style={{ animationDuration: '4s' }}>
-                    {/* Concentric Circles */}
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="0.3" className="text-purple-400" />
-                    <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" strokeWidth="0.3" className="text-amber-600" strokeDasharray="1 2" />
-                    <circle cx="50" cy="50" r="28" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-purple-500" />
-
-                    {/* 8-Pointed Star Geometry */}
-                    <g transform="translate(50,50)">
-                        {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => (
-                            <line 
-                                key={i} 
-                                x1="0" y1="-10" x2="0" y2="-40" 
-                                stroke="currentColor" 
-                                strokeWidth="0.5" 
-                                className={i % 2 === 0 ? "text-amber-400" : "text-purple-400"}
-                                transform={`rotate(${deg})`} 
-                            />
-                        ))}
-                        {/* Central Diamond */}
-                        <rect x="-8" y="-8" width="16" height="16" transform="rotate(45)" fill="none" stroke="currentColor" strokeWidth="1" className="text-amber-200" />
-                        {/* Core Eye */}
-                        <circle r="3" fill="currentColor" className="text-amber-100" />
-                    </g>
+             {/* Central Mandala SVG */}
+             <div className="absolute inset-0 flex items-center justify-center opacity-90">
+                <svg viewBox="0 0 100 100" className="w-[75%] h-[75%] text-amber-500/30 animate-[spin_60s_linear_infinite]">
+                    {/* Outer Ring */}
+                    <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 1" />
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="0.2" />
+                    
+                    {/* Geometric Star */}
+                    <path d="M50 2 L62 38 L98 50 L62 62 L50 98 L38 62 L2 50 L38 38 Z" fill="none" stroke="currentColor" strokeWidth="0.5" />
+                    <path d="M50 15 L58 42 L85 50 L58 58 L50 85 L42 58 L15 50 L42 42 Z" fill="currentColor" fillOpacity="0.1" />
+                    
+                    {/* Rotated Square */}
+                    <rect x="25" y="25" width="50" height="50" fill="none" stroke="currentColor" strokeWidth="0.3" transform="rotate(45 50 50)" />
+                    
+                    {/* Inner Circles */}
+                    <circle cx="50" cy="50" r="12" fill="none" stroke="currentColor" strokeWidth="0.8" />
+                    <circle cx="50" cy="50" r="6" fill="currentColor" fillOpacity="0.3" />
+                    <circle cx="50" cy="50" r="2" fill="#fff" fillOpacity="0.8" />
                 </svg>
              </div>
              
-             {/* Subtle Glow at Center */}
-             <div className="absolute inset-0 bg-radial-gradient from-amber-500/10 to-transparent opacity-50"></div>
+             {/* Static Central Glow */}
+             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                 <div className="w-16 h-16 bg-purple-500/10 rounded-full blur-xl"></div>
+                 <div className="w-2 h-2 bg-amber-100 rounded-full blur-[1px] animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.8)]"></div>
+             </div>
           </div>
 
           {/* Card Front */}

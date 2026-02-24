@@ -130,12 +130,15 @@ const VisualizerCard = ({
   isThumbnail: boolean;
 }) => {
   const [flipped, setFlipped] = useState(false);
+  const [landed, setLanded] = useState(isThumbnail);
 
   useEffect(() => {
     // For main view, trigger animation after mount. For thumbnails, show immediately.
     if (!isThumbnail) {
-        const timer = setTimeout(() => setFlipped(true), 50);
-        return () => clearTimeout(timer);
+        // Sequence: Land (Fly in) -> Flip
+        const landTimer = setTimeout(() => setLanded(true), 50);
+        const flipTimer = setTimeout(() => setFlipped(true), 600);
+        return () => { clearTimeout(landTimer); clearTimeout(flipTimer); };
     } else {
         setFlipped(true);
     }
@@ -147,7 +150,7 @@ const VisualizerCard = ({
       style={{ width: `${width}px`, height: `${height}px` }}
     >
       <div 
-        className={`w-full h-full transition-transform duration-700 preserve-3d relative ${flipped ? '[transform:rotateY(180deg)]' : ''}`}
+        className={`w-full h-full transition-all duration-700 ease-out preserve-3d relative ${flipped ? '[transform:rotateY(180deg)]' : ''} ${!isThumbnail && !landed ? 'opacity-0 translate-y-[100px] scale-50 rotate-12' : 'opacity-100 translate-y-0 scale-100 rotate-0'}`}
       >
         {/* Back Face */}
         <div className="absolute inset-0 backface-hidden rounded border border-purple-800 bg-indigo-950 shadow-sm flex items-center justify-center overflow-hidden">
@@ -225,6 +228,17 @@ const SpreadVisualizer = ({
   const offsetX = -((maxX + minX) / 2) * unitX;
   const offsetY = -((maxY + minY) / 2) * unitY;
 
+  // Effect for new card burst
+  const [burstIndex, setBurstIndex] = useState<number | null>(null);
+  
+  useEffect(() => {
+      if (drawnCards.length > 0 && !thumbnail) {
+          setBurstIndex(drawnCards.length - 1);
+          const timer = setTimeout(() => setBurstIndex(null), 1000);
+          return () => clearTimeout(timer);
+      }
+  }, [drawnCards.length, thumbnail]);
+
   return (
     <div className={`relative w-full ${thumbnail ? 'h-[120px] bg-transparent border-0' : 'h-[600px] bg-slate-900/30 border border-purple-900/20 shadow-inner'} rounded-xl overflow-hidden flex items-center justify-center mb-6`}>
       {!thumbnail && <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(88,28,135,0.15)_0%,_rgba(15,23,42,0)_70%)]"></div>}
@@ -269,6 +283,7 @@ const SpreadVisualizer = ({
           const isDrawn = idx < drawnCards.length;
           const isCurrent = idx === currentPositionIndex;
           const drawnCard = drawnCards[idx];
+          const showBurst = burstIndex === idx;
           
           return (
             <div
@@ -298,14 +313,22 @@ const SpreadVisualizer = ({
                   }`}
               >
                  {isDrawn ? (
-                   <VisualizerCard 
-                      card={drawnCard.card}
-                      isReversed={drawnCard.isReversed}
-                      width={cardW}
-                      height={cardH}
-                      fontSize={fontSize}
-                      isThumbnail={thumbnail}
-                   />
+                   <>
+                     <VisualizerCard 
+                        card={drawnCard.card}
+                        isReversed={drawnCard.isReversed}
+                        width={cardW}
+                        height={cardH}
+                        fontSize={fontSize}
+                        isThumbnail={thumbnail}
+                     />
+                     {showBurst && !thumbnail && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                            <div className="w-[150%] h-[150%] bg-amber-400/20 rounded-full blur-xl animate-ping"></div>
+                            <Sparkles className="text-amber-200 animate-spin absolute" size={40} />
+                        </div>
+                     )}
+                   </>
                  ) : (
                    !thumbnail && <span className="text-slate-500" style={{fontSize: `${fontSize}px`}}>{idx + 1}</span>
                  )}

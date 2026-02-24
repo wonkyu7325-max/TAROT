@@ -81,9 +81,9 @@ const CUSTOM_CARD_IMAGES: Record<string, string> = {
 
   // Cups replacements
   'cups-1': 'https://upload.wikimedia.org/wikipedia/commons/3/36/Cups01.jpg',
-  'cups-11': 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Cups11.jpg', // Page
+  'cups-11': 'https://www.sacred-texts.com/tarot/pkt/img/cu11.jpg', // Page
   'cups-12': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Cups12.jpg', // Knight
-  'cups-13': 'https://upload.wikimedia.org/wikipedia/commons/6/68/Cups13.jpg', // Queen
+  'cups-13': 'https://www.sacred-texts.com/tarot/pkt/img/cu13.jpg', // Queen
   'cups-14': 'https://upload.wikimedia.org/wikipedia/commons/0/04/Cups14.jpg', // King
 
   // Swords replacements
@@ -242,6 +242,36 @@ export const SPREADS: Spread[] = [
       { id: 2, name: '目前的阻碍', description: '你们之间存在的问题或挑战。', x: 1.3, y: 0 },
       { id: 3, name: '建议/行动', description: '如何改善关系的建议。', x: 0, y: -0.8 },
       { id: 4, name: '最终结果', description: '依照现状发展的可能性。', x: 0, y: -2.0 }
+    ],
+    tags: ['love', 'relationship']
+  },
+  {
+    id: 'reunion',
+    name: '破镜重圆 (7张)',
+    description: '专门针对分手复合的牌阵，深度分析双方现状、态度及复合可能性。',
+    positions: [
+      { id: 0, name: '提问者现状', description: '你目前的状态与处境。', x: -1.5, y: -1.5 },
+      { id: 1, name: '阻碍/分手原因', description: '导致分手的核心原因或目前的阻碍。', x: 0, y: -1.5 },
+      { id: 2, name: '提问者的态度', description: '你对这段感情的真实态度。', x: 1.5, y: -1.5 },
+      { id: 3, name: '对方现状', description: '对方目前的生活状态。', x: -1.5, y: 0 },
+      { id: 4, name: '对方态度', description: '对方对这段感情的想法。', x: 0, y: 0 },
+      { id: 5, name: '新恋情可能性', description: '对方身边是否有新的桃花或恋情。', x: 1.5, y: 0 },
+      { id: 6, name: '最终结果', description: '两人关系的最终走向。', x: 0, y: 1.5 }
+    ],
+    tags: ['love', 'relationship']
+  },
+  {
+    id: 'hexagram_love',
+    name: '六芒星桃花牌阵 (7张)',
+    description: '全面分析桃花运势、对方特质及关系发展的经典牌阵。',
+    positions: [
+      { id: 0, name: '提问者现状', description: '提问者当前的状态。', x: 0, y: -2 },
+      { id: 1, name: '未来桃花', description: '提问者未来3个月有无桃花。', x: 1.5, y: 1 },
+      { id: 2, name: '对方特质', description: '对方的个性与特质。', x: -1.5, y: 1 },
+      { id: 3, name: '对方星座', description: '对方所属的星座。', x: 0, y: 2 },
+      { id: 4, name: '认识渠道', description: '认识的渠道或者环境。', x: -1.5, y: -1 },
+      { id: 5, name: '关系挑战', description: '关系可能面临的挑战。', x: 1.5, y: -1 },
+      { id: 6, name: '最终结果', description: '最终的发展结果。', x: 0, y: 0 }
     ],
     tags: ['love', 'relationship']
   },
