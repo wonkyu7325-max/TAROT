@@ -26,6 +26,7 @@ export interface SpreadPosition {
   rotation?: number; // Rotation in degrees (e.g. 90 for crossing cards)
   parentId?: number; // ID of the parent node for tree visualization
   group?: string; // Grouping for semantic structure
+  allowedSuits?: Suit[]; // Restrict to specific suits
 }
 
 export interface Spread {

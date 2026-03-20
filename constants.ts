@@ -399,5 +399,18 @@ export const SPREADS: Spread[] = [
       { id: 9, name: '最终结果', description: '若现状持续发展，可能导向的结局。', x: 2.8, y: -1.5 },
     ],
     tags: ['general', 'complex']
+  },
+  {
+    id: 'four_seasons',
+    name: '四季牌阵 (5张)',
+    description: '仅在春分、夏至、秋分、冬至开放。探索未来一季的能量指引。',
+    positions: [
+      { id: 0, name: '核心能量', description: '本季度的核心精神与整体基调。', x: 0, y: 0, allowedSuits: [Suit.Major] },
+      { id: 1, name: '思维/挑战', description: '本季度的思维模式与可能面临的挑战。', x: 1.5, y: 0, allowedSuits: [Suit.Swords] },
+      { id: 2, name: '行动/动力', description: '本季度的行动力、热情与创造力。', x: -1.5, y: 0, allowedSuits: [Suit.Wands] },
+      { id: 3, name: '情感/人际', description: '本季度的情感状态与人际关系。', x: 0, y: 1.5, allowedSuits: [Suit.Cups] },
+      { id: 4, name: '物质/现实', description: '本季度的财务、工作与现实基础。', x: 0, y: -1.5, allowedSuits: [Suit.Pentacles] }
+    ],
+    tags: ['general', 'time']
   }
 ];

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Sparkles, ArrowRight, RotateCcw, Loader2, Search, Check, Layers, User, ArrowUp, ArrowDown, Layout, ArrowLeft, Star, Heart, StopCircle } from 'lucide-react';
+import { Sparkles, ArrowRight, RotateCcw, Loader2, Search, Check, Layers, User, ArrowUp, ArrowDown, Layout, ArrowLeft, Star, Heart, StopCircle, Lock } from 'lucide-react';
 import { AppStep, Spread, DrawnCard, TarotCard, ReadingRequest, Suit } from './types';
 import { getFullDeck, SPREADS, getCardImageUrl } from './constants';
 import { getTarotReading } from './services/geminiService';
@@ -9,6 +9,19 @@ import { CupIcon, WandIcon, SwordIcon, PentacleIcon, MysticStar, CornerDecoratio
 import ReactMarkdown from 'react-markdown';
 
 // --- Sub-components ---
+
+const checkIsEquinoxOrSolstice = () => {
+  const today = new Date();
+  const m = today.getMonth() + 1;
+  const d = today.getDate();
+  const validDates = [
+    [3, 19], [3, 20], [3, 21], [3, 22],
+    [6, 20], [6, 21], [6, 22],
+    [9, 22], [9, 23], [9, 24],
+    [12, 21], [12, 22], [12, 23]
+  ];
+  return validDates.some(([month, day]) => month === m && day === d);
+};
 
 // Animated Mystic Background
 const MysticBackground = () => {
@@ -543,6 +556,8 @@ const SpreadSelectionScreen = ({
     general: '综合运势'
   };
 
+  const isSpecialDay = checkIsEquinoxOrSolstice();
+
   return (
     <div className="min-h-screen p-4 flex flex-col items-center animate-fadeIn max-w-6xl mx-auto relative z-10">
       <div className="w-full flex items-center justify-between mb-8 mt-4 px-4">
@@ -570,12 +585,20 @@ const SpreadSelectionScreen = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full px-4 pb-12">
-        {filteredSpreads.map((spread) => (
+        {filteredSpreads.map((spread) => {
+          const isLocked = spread.id === 'four_seasons' && !isSpecialDay;
+          return (
           <div 
             key={spread.id}
-            onClick={() => onSelectSpread(spread)}
-            className="group bg-slate-900/40 border border-purple-900/30 hover:border-amber-500/30 rounded-xl overflow-hidden cursor-pointer transition-all duration-500 hover:transform hover:-translate-y-1 hover:shadow-[0_0_30px_-10px_rgba(88,28,135,0.3)] backdrop-blur-sm"
+            onClick={() => !isLocked && onSelectSpread(spread)}
+            className={`group bg-slate-900/40 border border-purple-900/30 rounded-xl overflow-hidden transition-all duration-500 backdrop-blur-sm relative ${isLocked ? 'opacity-60 cursor-not-allowed' : 'hover:border-amber-500/30 cursor-pointer hover:transform hover:-translate-y-1 hover:shadow-[0_0_30px_-10px_rgba(88,28,135,0.3)]'}`}
           >
+            {isLocked && (
+              <div className="absolute inset-0 bg-slate-950/60 z-20 flex flex-col items-center justify-center backdrop-blur-[2px]">
+                <Lock className="text-slate-400 mb-2" size={24} />
+                <span className="text-xs text-slate-300 font-serif tracking-widest">仅在节气日开放</span>
+              </div>
+            )}
             <div className="p-6 pb-2 relative">
                <div className="absolute top-0 right-0 p-3 opacity-20 group-hover:opacity-40 transition-opacity">
                    <MysticStar size={40} />
@@ -610,7 +633,7 @@ const SpreadSelectionScreen = ({
                <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">选择 <ArrowRight size={10} /></span>
             </div>
           </div>
-        ))}
+        )})}
       </div>
     </div>
   );
@@ -712,6 +735,14 @@ const CardInputBoard = ({
   const currentPosition = spread.positions[currentPositionIndex];
   const isComplete = drawnCards.length === spread.positions.length;
 
+  useEffect(() => {
+    if (currentPosition?.allowedSuits && currentPosition.allowedSuits.length > 0) {
+      if (!currentPosition.allowedSuits.includes(activeTab as Suit)) {
+        setActiveTab(currentPosition.allowedSuits[0]);
+      }
+    }
+  }, [currentPosition, activeTab]);
+
   // Tabs for Suits
   const tabs = [
     { id: Suit.Major, label: '大阿卡纳', icon: <MysticStar size={14} /> },
@@ -720,6 +751,13 @@ const CardInputBoard = ({
     { id: Suit.Swords, label: '宝剑', icon: <SwordIcon size={14} /> },
     { id: Suit.Pentacles, label: '星币', icon: <PentacleIcon size={14} /> },
   ];
+
+  const visibleTabs = tabs.filter(tab => {
+    if (currentPosition?.allowedSuits) {
+      return currentPosition.allowedSuits.includes(tab.id as Suit);
+    }
+    return true;
+  });
 
   // Filter cards based on search AND tab AND not already drawn
   const filteredCards = useMemo(() => {
@@ -733,10 +771,14 @@ const CardInputBoard = ({
       
       const matchesTab = searchTerm !== '' ? true : c.suit === activeTab; // Ignore tab if searching
       
+      const matchesAllowed = currentPosition?.allowedSuits 
+        ? currentPosition.allowedSuits.includes(c.suit)
+        : true;
+
       // Filter out if card is already selected
-      return matchesSearch && matchesTab && !drawnIds.has(c.id);
+      return matchesSearch && matchesTab && matchesAllowed && !drawnIds.has(c.id);
     });
-  }, [fullDeck, searchTerm, activeTab, drawnCards]);
+  }, [fullDeck, searchTerm, activeTab, drawnCards, currentPosition]);
 
   const handleSelectCard = (card: TarotCard) => {
     setSelectedCard(card);
@@ -856,12 +898,12 @@ const CardInputBoard = ({
          </div>
 
          {/* Right Side: Card Selection */}
-         <div className="flex flex-col bg-slate-900/50 border border-purple-800/30 rounded-xl overflow-hidden h-[600px] backdrop-blur-sm shadow-2xl relative">
+         <div className="flex flex-col bg-slate-900/50 border border-purple-800/30 rounded-xl md:overflow-hidden min-h-[600px] md:h-[600px] h-auto backdrop-blur-sm shadow-2xl relative">
             <CornerDecoration className="absolute top-2 left-2 text-white/5 pointer-events-none" />
             <CornerDecoration className="absolute bottom-2 right-2 text-white/5 pointer-events-none" rotate={180} />
 
             {/* Search Bar */}
-            <div className="p-4 border-b border-purple-800/30 bg-slate-950/50">
+            <div className="p-4 border-b border-purple-800/30 bg-slate-950/50 sticky top-0 z-20 backdrop-blur-md">
               <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" size={16} />
                   <input 
@@ -876,8 +918,8 @@ const CardInputBoard = ({
 
             {/* Suit Tabs */}
             {!searchTerm && (
-              <div className="flex overflow-x-auto border-b border-purple-800/30 bg-slate-950/30 scrollbar-hide">
-                {tabs.map(tab => (
+              <div className="flex overflow-x-auto border-b border-purple-800/30 bg-slate-950/30 scrollbar-hide sticky top-[65px] z-20 backdrop-blur-md">
+                {visibleTabs.map(tab => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
@@ -895,7 +937,7 @@ const CardInputBoard = ({
             )}
 
             {/* Card List Area */}
-            <div className="flex-1 overflow-hidden relative flex">
+            <div className="flex-1 relative flex flex-col md:overflow-hidden">
                {selectedCard ? (
                  /* Selection Confirmation View */
                  <div className="absolute inset-0 bg-slate-900/95 z-10 flex flex-col items-center justify-center p-6 animate-fadeIn">
@@ -942,7 +984,7 @@ const CardInputBoard = ({
                  </div>
                ) : (
                  /* Card Grid View */
-                 <div className="flex-1 overflow-y-auto p-3 custom-scrollbar grid grid-cols-3 sm:grid-cols-3 gap-3 content-start">
+                 <div className="flex-1 md:overflow-y-auto p-3 custom-scrollbar grid grid-cols-3 sm:grid-cols-3 gap-3 content-start">
                     {filteredCards.map(card => (
                       <div 
                         key={card.id}
@@ -1028,13 +1070,13 @@ const ReadingResult = ({
       </div>
 
       {/* Right Column: Interpretation */}
-      <div className="md:w-2/3 bg-slate-900/80 border border-purple-500/20 rounded-2xl p-6 md:p-8 shadow-[0_0_50px_-10px_rgba(88,28,135,0.2)] overflow-y-auto max-h-[85vh] relative backdrop-blur-md">
+      <div className="md:w-2/3 bg-slate-900/80 border border-purple-500/20 rounded-2xl p-6 md:p-8 shadow-[0_0_50px_-10px_rgba(88,28,135,0.2)] md:overflow-y-auto md:max-h-[85vh] h-auto relative backdrop-blur-md">
          {/* Decorative corners */}
          <CornerDecoration className="absolute top-4 left-4 text-purple-500/20" />
          <CornerDecoration className="absolute top-4 right-4 text-purple-500/20" rotate={90} />
 
          {loading ? (
-           <div className="absolute inset-0 flex flex-col items-center justify-center space-y-6 bg-slate-900/90 z-20">
+           <div className="flex flex-col items-center justify-center space-y-6 min-h-[400px] z-20">
              <div className="relative">
                 <div className="absolute inset-0 bg-purple-500/30 blur-xl rounded-full"></div>
                 <Loader2 className="w-12 h-12 text-amber-200 animate-spin relative z-10" />
